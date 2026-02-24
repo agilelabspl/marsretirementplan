@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mars Billboard — Buy a Plot on Mars</title>
+<meta name="description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe. Buy your plot on the Red Planet.">
+<link rel="canonical" href="https://agilelabspl.github.io/marsbillboard/">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Paweł Lewiński">
+<meta name="theme-color" content="#0a0e1a">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mars Billboard — Buy a Plot on Mars">
+<meta property="og:description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe.">
+<meta property="og:url" content="https://agilelabspl.github.io/marsbillboard/">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Mars Billboard">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mars Billboard — Buy a Plot on Mars">
+<meta name="twitter:description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe.">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --bg: #0a0e1a;
+  --card: #111827;
+  --accent: #38bdf8;
+  --mars: #c1440e;
+  --mars-light: #e8734a;
+  --green: #22c55e;
+  --text: #e2e8f0;
+  --muted: #64748b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 20px 16px 8px;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  font-weight: 900;
+  font-size: 1.8rem;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--mars-light), var(--accent), var(--mars-light));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.subtitle {
+  font-weight: 300;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 12px 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat { display: flex; align-items: baseline; gap: 6px; }
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#globe-container {
+  width: 100%;
+  height: 68vh;
+  min-height: 400px;
+  position: relative;
+  z-index: 1;
+  cursor: grab;
+}
+#globe-container:active { cursor: grabbing; }
+
+.footer-bar {
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-bar .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--mars);
+  border-radius: 50%;
+  margin-right: 4px;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.footer-bar a { color: var(--muted); text-decoration: none; }
+.footer-bar a:hover { color: var(--accent); }
+
+/* Loading */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.6s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+
+.loader {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(193, 68, 14, 0.2);
+  border-top-color: var(--mars);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading p { margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 20;
+  font-family: 'Outfit', sans-serif;
+  background: var(--card);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  transition: opacity 0.15s;
+}
+#tooltip.hidden { opacity: 0; }
+#tooltip b { display: block; }
+#tooltip small { color: var(--muted); font-size: 11px; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50; padding: 16px;
+  opacity: 1; transition: opacity 0.25s;
+}
+.modal-overlay.hidden { opacity: 0; pointer-events: none; }
+
+.modal-card {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 380px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.modal-close {
+  position: absolute; top: 12px; right: 16px;
+  background: none; border: none;
+  color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 4px; }
+.modal-location { font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+
+.modal-row {
+  display: flex; justify-content: space-between;
+  font-size: 0.8rem; padding: 7px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.modal-row span:first-child { color: var(--muted); }
+.modal-row span:last-child {
+  font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+}
+
+.modal-msg {
+  margin: 12px 0; padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px; font-size: 0.85rem;
+  font-style: italic; color: var(--text);
+  border-left: 3px solid var(--accent);
+}
+
+.modal-btn {
+  display: block; width: 100%; margin-top: 16px; padding: 12px;
+  border: none; border-radius: 10px;
+  font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.9rem;
+  cursor: pointer; text-align: center;
+}
+.modal-btn.disabled { background: rgba(255,255,255,0.05); color: var(--muted); cursor: not-allowed; }
+.modal-btn-hint { text-align: center; font-size: 0.7rem; color: var(--muted); margin-top: 6px; }
+
+.modal-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 10px;
+}
+.modal-badge.sold { background: rgba(239,68,68,0.15); color: #ef4444; }
+.modal-badge.free { background: rgba(34,197,94,0.15); color: #22c55e; }
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.4rem; }
+  #globe-container { height: 60vh; min-height: 320px; }
+  .stats-bar { gap: 16px; }
+  .stat-value { font-size: 1.1rem; }
+  .modal-card { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loader"></div>
+  <p>Loading Mars...</p>
+</div>
+
+<header>
+  <h1>Mars Billboard</h1>
+  <div class="subtitle"></div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-value" id="sold-count">—</span>
+    <span class="stat-label" id="sold-label">/ 648</span>
+  </div>
+  <div class="stat">
+    <span class="stat-value" id="revenue">—</span>
+    <span class="stat-label" id="revenue-label"></span>
+  </div>
+</div>
+
+<div id="globe-container"></div>
+<div id="tooltip" class="hidden"></div>
+
+<div class="footer-bar">
+  <span class="dot"></span>
+  <span id="footer-text"></span>
+  <span style="margin-left:12px;">|</span>
+  <a href="https://agilelabspl.github.io/okozorbity/" target="_blank" style="margin-left:12px;">Oko z Orbity</a>
+</div>
+
+<div id="modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Three.js via import map -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── CONFIG ──
+const MARS_RADIUS_KM = 3389.5;
+const GLOBE_R = 2;
+const GRID_COLS = 36;
+const GRID_ROWS = 18;
+const DEG = 10;
+
+// ── LABELS ──
+const T = {
+  loading: 'Loading Mars...',
+  title: 'Mars Billboard',
+  pageTitle: 'Mars Billboard — Buy a Plot on Mars',
+  subtitle: 'Million Dollar Homepage... but on Mars.',
+  soldLabel: 'sold',
+  revenueLabel: 'value',
+  footer: '648 plots · 144.8M km² · Texture: NASA/Solar System Scope',
+  plotLabel: 'Plot',
+  coords: 'Coordinates',
+  area: 'Area',
+  price: 'Price',
+  owner: 'Owner',
+  date: 'Purchase date',
+  reserve: 'Reserve this plot',
+  comingSoon: 'registration coming soon',
+  sold: 'SOLD',
+  free: 'AVAILABLE',
+  avgTemp: 'Avg. temperature',
+  paidLabel: 'Paid',
+};
+
+// ── SOLD PLOTS ──
+const SOLD = {
+  '4-10':  { owner: 'Elon Musk', msg: 'Future SpaceX HQ', loc: 'Olympus Mons', date: '2025-12-25', price: 50000000, color: '#f97316' },
+  '11-7':  { owner: 'Grand Canyon Tourism Board', msg: 'Hold my beer', loc: 'Valles Marineris', date: '2026-01-15', price: 25000000, color: '#ef4444' },
+  '31-8':  { owner: 'NASA Curiosity', msg: 'I was here first!', loc: 'Gale Crater', date: '2012-08-06', price: 10000000, color: '#38bdf8' },
+  '25-4':  { owner: 'IKEA Mars', msg: 'BJÖRK shelf — some assembly required', loc: 'Hellas Planitia', date: '2026-02-01', price: 5000000, color: '#facc15' },
+  '15-13': { owner: 'Mark Watney', msg: "I'm gonna science the shit out of this", loc: 'Acidalia Planitia', date: '2035-11-01', price: 1000000, color: '#22c55e' },
+  '33-9':  { owner: 'Jeff Bezos', msg: 'Amazon Prime Mars — delivery in 7 months', loc: 'Elysium Planitia', date: '2026-01-20', price: 15000000, color: '#a78bfa' },
+  '25-9':  { owner: 'Pizza Hut Mars', msg: "30 light-minutes or it's free", loc: 'Syrtis Major', date: '2026-01-10', price: 3000000, color: '#ef4444' },
+  '14-11': { owner: 'NASA Viking', msg: 'First selfie on Mars since 1976', loc: 'Chryse Planitia', date: '1976-07-20', price: 5000000, color: '#60a5fa' },
+  '28-11': { owner: 'Zhurong 祝融', msg: 'China was here', loc: 'Utopia Planitia', date: '2021-05-14', price: 8000000, color: '#f87171' },
+  '19-11': { owner: 'Dogecoin Foundation', msg: 'To the Mars! Much red. Very planet.', loc: 'Arabia Terra', date: '2026-02-14', price: 1000000, color: '#fbbf24' },
+  '8-9':   { owner: "McDonald's Mars", msg: 'Over 0 served', loc: 'Tharsis', date: '2026-01-05', price: 7000000, color: '#fbbf24' },
+  '2-11':  { owner: 'Netflix Mars', msg: 'Still buffering...', loc: 'Amazonis Planitia', date: '2026-02-10', price: 4000000, color: '#ef4444' },
+  '19-5':  { owner: 'Matt Damon', msg: "I'm not stuck here again, am I?", loc: 'Noachis Terra', date: '2026-01-28', price: 2000000, color: '#fb923c' },
+  '1-13':  { owner: 'LEGO Mars', msg: 'Everything is awesome on Mars!', loc: 'Arcadia Planitia', date: '2026-02-05', price: 3000000, color: '#facc15' },
+  '25-10': { owner: 'Perseverance', msg: 'Rocks. More rocks. Still rocks.', loc: 'Jezero Crater', date: '2021-02-18', price: 6000000, color: '#38bdf8' },
+  '32-5':  { owner: "Elon's Cat", msg: 'Meow from Mars', loc: 'Terra Cimmeria', date: '2026-02-20', price: 1000000, color: '#f9a8d4' },
+  '9-6':   { owner: 'Bernie Sanders', msg: 'Free healthcare for all planets!', loc: 'Solis Planum', date: '2026-02-15', price: 1000000, color: '#60a5fa' },
+  '13-4':  { owner: 'Starbucks Mars', msg: 'Venti Martian Latte — $47.99', loc: 'Argyre Planitia', date: '2026-01-18', price: 4000000, color: '#22c55e' },
+  '7-13':  { owner: 'Google Mars', msg: "I'm feeling lucky", loc: 'Alba Mons', date: '2026-02-08', price: 10000000, color: '#4ade80' },
+  '12-10': { owner: 'SpaceX Intern', msg: 'Elon said I could have this one', loc: 'Lunae Planum', date: '2026-02-22', price: 1000000, color: '#fb923c' },
+  '13-9':  { owner: 'Wikipedia Mars', msg: '[citation needed]', loc: 'Xanthe Terra', date: '2026-02-12', price: 0, color: '#94a3b8' },
+  '29-7':  { owner: 'Mars Inc.', msg: 'Finally on brand', loc: 'Hesperia Planum', date: '2026-01-25', price: 20000000, color: '#7c3aed' },
+  '22-8':  { owner: 'Rick Astley', msg: 'Never gonna give Mars up', loc: 'Terra Sabaea', date: '2026-02-14', price: 1000000, color: '#f43f5e' },
+  '5-7':   { owner: 'ChatGPT', msg: 'As a large language model, I cannot own land', loc: 'Daedalia Planum', date: '2026-02-18', price: 0, color: '#818cf8' },
+  '11-13': { owner: 'Your Mom', msg: 'She says hi from Mars!', loc: 'Tempe Terra', date: '2026-02-23', price: 1000000, color: '#f472b6' },
+};
+
+// ── GRID / PLOT GENERATION ──
+function calcArea(lat1Deg, lat2Deg, lonSpanDeg) {
+  const R = MARS_RADIUS_KM;
+  const l1 = lat1Deg * Math.PI / 180, l2 = lat2Deg * Math.PI / 180;
+  return Math.abs(R * R * (Math.sin(l2) - Math.sin(l1)) * (lonSpanDeg * Math.PI / 180));
+}
+
+function generatePlots() {
+  const plots = []; let num = 1;
+  for (let row = 0; row < GRID_ROWS; row++) {
+    for (let col = 0; col < GRID_COLS; col++) {
+      const lat0 = row * DEG - 90, lat1 = lat0 + DEG;
+      const lon0 = col * DEG - 180, lon1 = lon0 + DEG;
+      const id = `${col}-${row}`;
+      const sold = SOLD[id] || null;
+      plots.push({ id, num: num++, row, col, lat0, lat1, lon0, lon1,
+        latC: (lat0 + lat1) / 2, lonC: (lon0 + lon1) / 2,
+        area: Math.round(calcArea(lat0, lat1, DEG)),
+        price: sold ? sold.price : 1000000, sold });
+    }
+  }
+  return plots;
+}
+
+// ── HELPERS ──
+function fmtPrice(n) {
+  if (n === 0) return 'Donated';
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1) + 'M';
+  return '$' + n.toLocaleString();
+}
+function fmtCoords(lat, lon) {
+  return `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(1)}°${lon >= 0 ? 'E' : 'W'}`;
+}
+function fmtArea(km2) { return km2.toLocaleString('en-US') + ' km²'; }
+
+// ── COORDINATE CONVERSION ──
+// Three.js SphereGeometry: phi=azimuthal from +X (ccw), theta=polar from +Y
+function latLonToVec3(lat, lon, r) {
+  const phi = (lon + 180) * Math.PI / 180;
+  const theta = (90 - lat) * Math.PI / 180;
+  return new THREE.Vector3(
+    -r * Math.cos(phi) * Math.sin(theta),
+     r * Math.cos(theta),
+     r * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+function vec3ToLatLon(p) {
+  const r = p.length();
+  const lat = 90 - Math.acos(Math.max(-1, Math.min(1, p.y / r))) * 180 / Math.PI;
+  const lon = ((Math.atan2(p.z, -p.x) * 180 / Math.PI) - 180 + 540) % 360 - 180;
+  return { lat, lon };
+}
+
+// ── CELL MESH BUILDER ──
+function createCellGeometry(lat0, lat1, lon0, lon1, r) {
+  const S = 5;
+  const verts = [];
+  const idx = [];
+  for (let i = 0; i <= S; i++) {
+    for (let j = 0; j <= S; j++) {
+      const lat = lat0 + (lat1 - lat0) * i / S;
+      const lon = lon0 + (lon1 - lon0) * j / S;
+      const v = latLonToVec3(lat, lon, r);
+      verts.push(v.x, v.y, v.z);
+    }
+  }
+  for (let i = 0; i < S; i++) {
+    for (let j = 0; j < S; j++) {
+      const a = i * (S + 1) + j, b = a + 1;
+      const c = (i + 1) * (S + 1) + j, d = c + 1;
+      idx.push(a, c, b, b, c, d);
+    }
+  }
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geom.setIndex(idx);
+  geom.computeVertexNormals();
+  return geom;
+}
+
+// ── MODAL ──
+function showModal(plot) {
+  const modal = document.getElementById('modal');
+  const body = document.getElementById('modal-body');
+  if (plot.sold) {
+    const s = plot.sold;
+    body.innerHTML = `
+      <div class="modal-badge sold">${T.sold}</div>
+      <div class="modal-title" style="color:${s.color}">${s.loc}</div>
+      <div class="modal-location">${T.plotLabel} #${plot.num} · ${fmtCoords(plot.latC, plot.lonC)}</div>
+      <div class="modal-msg" style="border-color:${s.color}">"${s.msg}"</div>
+      <div class="modal-row"><span>${T.owner}</span><span>${s.owner}</span></div>
+      <div class="modal-row"><span>${T.date}</span><span>${s.date}</span></div>
+      <div class="modal-row"><span>${T.paidLabel}</span><span>${fmtPrice(s.price)}</span></div>
+      <div class="modal-row"><span>${T.area}</span><span>${fmtArea(plot.area)}</span></div>
+      <div class="modal-row"><span>${T.coords}</span><span>${fmtCoords(plot.latC, plot.lonC)}</span></div>`;
+  } else {
+    body.innerHTML = `
+      <div class="modal-badge free">${T.free}</div>
+      <div class="modal-title">${T.plotLabel} #${plot.num}</div>
+      <div class="modal-location">${fmtCoords(plot.lat0, plot.lon0)} → ${fmtCoords(plot.lat1, plot.lon1)}</div>
+      <div class="modal-row"><span>${T.coords}</span><span>${fmtCoords(plot.latC, plot.lonC)}</span></div>
+      <div class="modal-row"><span>${T.area}</span><span>${fmtArea(plot.area)}</span></div>
+      <div class="modal-row"><span>${T.avgTemp}</span><span>-60°C</span></div>
+      <div class="modal-row"><span>${T.price}</span><span style="color:var(--green)">${fmtPrice(plot.price)}</span></div>
+      <button class="modal-btn disabled">${T.reserve}</button>
+      <div class="modal-btn-hint">${T.comingSoon}</div>`;
+  }
+  modal.classList.remove('hidden');
+}
+function hideModal() { document.getElementById('modal').classList.add('hidden'); }
+
+// ══════════════════════════════════════════
+// ── THREE.JS SCENE ──
+// ══════════════════════════════════════════
+function init() {
+  // i18n
+  document.title = T.pageTitle;
+  document.querySelector('#loading p').textContent = T.loading;
+  document.querySelector('h1').textContent = T.title;
+  document.querySelector('.subtitle').textContent = T.subtitle;
+  document.getElementById('sold-label').textContent = `/ 648 ${T.soldLabel}`;
+  document.getElementById('revenue-label').textContent = T.revenueLabel;
+  document.getElementById('footer-text').textContent = T.footer;
+
+  const plots = generatePlots();
+  const soldPlots = plots.filter(p => p.sold);
+  document.getElementById('sold-count').textContent = soldPlots.length;
+  document.getElementById('revenue').textContent = fmtPrice(soldPlots.reduce((s, p) => s + p.sold.price, 0));
+
+  const container = document.getElementById('globe-container');
+  const W = container.clientWidth, H = container.clientHeight;
+
+  // ── Renderer ──
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  container.appendChild(renderer.domElement);
+
+  // ── Scene ──
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0e1a);
+
+  // ── Camera ──
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 1000);
+  camera.position.set(0, 0.5, 5.5);
+
+  // ── Controls ──
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enablePan = false;
+  controls.minDistance = 3;
+  controls.maxDistance = 10;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.3;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+
+  // ── Lighting (orbitsignal style) ──
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+  mainLight.position.set(5, 3, 5);
+  scene.add(mainLight);
+  const fillLight = new THREE.DirectionalLight(0xcc8866, 0.4);
+  fillLight.position.set(-3, -1, -4);
+  scene.add(fillLight);
+
+  // ── Stars ──
+  const starPositions = [];
+  for (let i = 0; i < 3000; i++) {
+    const r = 50 + Math.random() * 50;
+    const th = Math.random() * Math.PI * 2;
+    const ph = Math.acos(2 * Math.random() - 1);
+    starPositions.push(r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph));
+  }
+  const starsGeom = new THREE.BufferGeometry();
+  starsGeom.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+  scene.add(new THREE.Points(starsGeom, new THREE.PointsMaterial({
+    color: 0xffffff, size: 0.15, transparent: true, opacity: 0.8, sizeAttenuation: true
+  })));
+
+  // ── Mars Globe ──
+  const textureLoader = new THREE.TextureLoader();
+  const marsTexture = textureLoader.load('./mars-2k.jpg', () => {
+    document.getElementById('loading').classList.add('hidden');
+  });
+  marsTexture.colorSpace = THREE.SRGBColorSpace;
+
+  const globeGeom = new THREE.SphereGeometry(GLOBE_R, 64, 64);
+  const globeMat = new THREE.MeshStandardMaterial({
+    map: marsTexture,
+    metalness: 0.1,
+    roughness: 0.7,
+  });
+  const globe = new THREE.Mesh(globeGeom, globeMat);
+  scene.add(globe);
+
+  // ── Atmosphere layers (orbitsignal technique: BackSide spheres) ──
+  scene.add(new THREE.Mesh(
+    new THREE.SphereGeometry(GLOBE_R * 1.01, 64, 64),
+    new THREE.MeshBasicMaterial({ color: 0xcc6644, transparent: true, opacity: 0.08, side: THREE.BackSide })
+  ));
+  scene.add(new THREE.Mesh(
+    new THREE.SphereGeometry(GLOBE_R * 1.06, 64, 64),
+    new THREE.MeshBasicMaterial({ color: 0xff8844, transparent: true, opacity: 0.04, side: THREE.BackSide })
+  ));
+
+  // ── Grid lines ──
+  const gridMat = new THREE.LineBasicMaterial({ color: 0xc1440e, transparent: true, opacity: 0.12 });
+  const gridR = GLOBE_R * 1.001;
+
+  // Latitude lines
+  for (let lat = -80; lat <= 80; lat += DEG) {
+    const pts = [];
+    for (let lon = -180; lon <= 180; lon += 2) pts.push(latLonToVec3(lat, lon, gridR));
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+  }
+  // Longitude lines
+  for (let lon = -180; lon < 180; lon += DEG) {
+    const pts = [];
+    for (let lat = -90; lat <= 90; lat += 2) pts.push(latLonToVec3(lat, lon, gridR));
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+  }
+
+  // ── Sold cell meshes ──
+  const cellR = GLOBE_R * 1.002;
+  const soldMeshes = [];
+  for (const plot of plots) {
+    if (!plot.sold) continue;
+    const geom = createCellGeometry(plot.lat0, plot.lat1, plot.lon0, plot.lon1, cellR);
+    const mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
+      color: new THREE.Color(plot.sold.color),
+      transparent: true, opacity: 0.3, side: THREE.DoubleSide, depthWrite: false,
+    }));
+    scene.add(mesh);
+    soldMeshes.push(mesh);
+  }
+
+  // ── Rover markers ──
+  const ROVERS = [
+    { name: 'Curiosity',     lat: -5.4,  lon: 137.8, color: 0x38bdf8, since: 2012, status: 'Active' },
+    { name: 'Perseverance',  lat: 18.4,  lon: 77.5,  color: 0x22c55e, since: 2021, status: 'Active' },
+    { name: 'Zhurong 祝融',  lat: 25.1,  lon: 109.9, color: 0xf87171, since: 2021, status: 'Dormant' },
+  ];
+
+  // Glow sprite texture (procedural)
+  const glowCanvas = document.createElement('canvas');
+  glowCanvas.width = 64; glowCanvas.height = 64;
+  const gCtx = glowCanvas.getContext('2d');
+  const gradient = gCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.15, 'rgba(255,255,255,0.8)');
+  gradient.addColorStop(0.4, 'rgba(255,255,255,0.2)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  gCtx.fillStyle = gradient;
+  gCtx.fillRect(0, 0, 64, 64);
+  const glowTexture = new THREE.CanvasTexture(glowCanvas);
+
+  const roverMarkers = [];
+  const markerR = GLOBE_R * 1.008;
+
+  for (const rv of ROVERS) {
+    const pos = latLonToVec3(rv.lat, rv.lon, markerR);
+    const group = new THREE.Group();
+    group.position.copy(pos);
+
+    // Glow sprite
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTexture, color: rv.color, transparent: true, opacity: 0.9,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    }));
+    sprite.scale.set(0.12, 0.12, 1);
+    group.add(sprite);
+
+    // Point light
+    const light = new THREE.PointLight(rv.color, 0.3, 0.6);
+    group.add(light);
+
+    scene.add(group);
+    roverMarkers.push({ group, sprite, rv, baseScale: 0.12 });
+  }
+
+  // Rover label overlay (CSS2D-like, positioned in render loop)
+  const roverLabelsEl = document.createElement('div');
+  roverLabelsEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;';
+  container.appendChild(roverLabelsEl);
+
+  const roverLabelDivs = ROVERS.map(rv => {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+      color:#fff;background:rgba(0,0,0,0.7);padding:1px 5px;border-radius:3px;white-space:nowrap;
+      border:1px solid #${rv.color.toString(16).padStart(6,'0')}40;transform:translate(-50%,-100%);`;
+    el.textContent = rv.name.split(' ')[0]; // short name
+    roverLabelsEl.appendChild(el);
+    return el;
+  });
+
+  function updateRoverLabels() {
+    for (let i = 0; i < ROVERS.length; i++) {
+      const pos = roverMarkers[i].group.position.clone().project(camera);
+      const el = roverLabelDivs[i];
+      // Behind globe check
+      const camDist = camera.position.distanceTo(roverMarkers[i].group.position);
+      const centerDist = camera.position.length();
+      if (pos.z > 1 || camDist > centerDist + GLOBE_R * 0.3) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = '';
+        el.style.left = ((pos.x + 1) / 2 * 100) + '%';
+        el.style.top = ((-pos.y + 1) / 2 * 100) + '%';
+      }
+    }
+  }
+
+  // ── Hover highlight mesh ──
+  let hoverMesh = null;
+  let hoveredPlot = null;
+  const hoverMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0.15, side: THREE.DoubleSide, depthWrite: false,
+  });
+
+  function setHover(plot) {
+    if (plot === hoveredPlot) return;
+    hoveredPlot = plot;
+    if (hoverMesh) { scene.remove(hoverMesh); hoverMesh.geometry.dispose(); hoverMesh = null; }
+    if (plot) {
+      const geom = createCellGeometry(plot.lat0, plot.lat1, plot.lon0, plot.lon1, cellR + 0.001);
+      hoverMesh = new THREE.Mesh(geom, hoverMat);
+      scene.add(hoverMesh);
+    }
+  }
+
+  // ── Raycasting ──
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const tooltip = document.getElementById('tooltip');
+  let isDragging = false;
+
+  function getPlotFromEvent(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObject(globe);
+    if (hits.length === 0) return null;
+    const { lat, lon } = vec3ToLatLon(hits[0].point);
+    const col = Math.floor((lon + 180) / DEG);
+    const row = Math.floor((lat + 90) / DEG);
+    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return null;
+    return plots[row * GRID_COLS + col];
+  }
+
+  renderer.domElement.addEventListener('mousemove', (e) => {
+    if (isDragging) { setHover(null); tooltip.classList.add('hidden'); return; }
+    const plot = getPlotFromEvent(e);
+    setHover(plot);
+    if (plot) {
+      container.style.cursor = 'pointer';
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY + 14) + 'px';
+      if (plot.sold) {
+        tooltip.innerHTML = `<b style="color:${plot.sold.color}">${plot.sold.owner}</b><small>${plot.sold.loc}</small>`;
+        tooltip.style.borderColor = plot.sold.color + '40';
+      } else {
+        tooltip.innerHTML = `<b>${T.plotLabel} #${plot.num}</b><small>${fmtArea(plot.area)} · ${fmtPrice(plot.price)}</small>`;
+        tooltip.style.borderColor = 'rgba(193,68,14,0.25)';
+      }
+      tooltip.style.border = `1px solid ${tooltip.style.borderColor}`;
+      tooltip.classList.remove('hidden');
+    } else {
+      container.style.cursor = 'grab';
+      tooltip.classList.add('hidden');
+    }
+  });
+
+  renderer.domElement.addEventListener('pointerdown', () => { isDragging = false; });
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (e.buttons > 0) isDragging = true;
+  });
+  renderer.domElement.addEventListener('click', (e) => {
+    if (isDragging) return;
+    const plot = getPlotFromEvent(e);
+    if (plot) showModal(plot);
+  });
+
+  // ── Modal close ──
+  document.querySelector('.modal-close').addEventListener('click', hideModal);
+  document.getElementById('modal').addEventListener('click', (e) => { if (e.target === e.currentTarget) hideModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideModal(); });
+
+  // ── Auto-rotate pause/resume ──
+  let idleTimer;
+  controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(idleTimer); });
+  controls.addEventListener('end', () => { idleTimer = setTimeout(() => { controls.autoRotate = true; }, 5000); });
+
+  // ── Resize ──
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+
+  // ── Fallback loading hide ──
+  setTimeout(() => { document.getElementById('loading').classList.add('hidden'); }, 8000);
+
+  // ── Render loop ──
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+
+    // Pulse rover markers
+    const t = clock.getElapsedTime();
+    for (const rm of roverMarkers) {
+      const pulse = 1 + 0.3 * Math.sin(t * 2.5);
+      const s = rm.baseScale * pulse;
+      rm.sprite.scale.set(s, s, 1);
+    }
+
+    updateRoverLabels();
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+try { init(); } catch(e) {
+  console.error('Mars Billboard error:', e);
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('globe-container').innerHTML =
+    `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;font-size:1rem;padding:20px;text-align:center;">
+    WebGL error. Check console (F12).<br>
+    <small style="color:#64748b;margin-top:8px;">${e.message}</small></div>`;
+}
+</script>
+</body>
+</html>
