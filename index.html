@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Mars Billboard — Buy a Plot on Mars</title>
-<meta name="description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe. Buy your plot on the Red Planet.">
+<title>Mars Retirement Plan — Buy a Plot on Mars</title>
+<meta name="description" content="The world's worst investment strategy. Buy a plot on Mars for $2. 1,000,000 plots on a rotating 3D globe.">
 <link rel="canonical" href="https://agilelabspl.github.io/marsbillboard/">
 <meta name="robots" content="index, follow">
 <meta name="author" content="Paweł Lewiński">
@@ -12,16 +12,16 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="Mars Billboard — Buy a Plot on Mars">
-<meta property="og:description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe.">
+<meta property="og:title" content="Mars Retirement Plan — The World's Worst Investment Strategy">
+<meta property="og:description" content="1,000,000 plots on Mars. $2 each. Buy a plot on a rotating 3D globe. Fund my retirement.">
 <meta property="og:url" content="https://agilelabspl.github.io/marsbillboard/">
 <meta property="og:locale" content="en_US">
-<meta property="og:site_name" content="Mars Billboard">
+<meta property="og:site_name" content="Mars Retirement Plan">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Mars Billboard — Buy a Plot on Mars">
-<meta name="twitter:description" content="Million Dollar Homepage on Mars. 648 plots on a rotating 3D globe.">
+<meta name="twitter:title" content="Mars Retirement Plan — The World's Worst Investment Strategy">
+<meta name="twitter:description" content="1,000,000 plots on Mars. $2 each. Buy a plot on a rotating 3D globe. Fund my retirement.">
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -71,17 +71,19 @@ h1 {
 }
 
 .subtitle {
-  font-weight: 300;
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-top: 4px;
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--text);
+  margin-top: 6px;
+  opacity: 0.7;
+  letter-spacing: 0.3px;
 }
 
 .stats-bar {
   display: flex;
   justify-content: center;
   gap: 32px;
-  padding: 12px 16px;
+  padding: 12px 16px 6px;
   position: relative;
   z-index: 1;
 }
@@ -100,6 +102,49 @@ h1 {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.progress-wrap {
+  max-width: 340px;
+  margin: 0 auto 4px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+.progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--mars), var(--mars-light), var(--accent));
+  border-radius: 3px;
+  transition: width 1.2s ease;
+  min-width: 3px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(193, 68, 14, 0.6);
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: progress-shimmer 2s ease-in-out infinite;
+}
+@keyframes progress-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.progress-label {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 #globe-container {
@@ -135,6 +180,13 @@ h1 {
   50% { opacity: 0.3; }
 }
 
+.footer-distance {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--mars-light);
+  letter-spacing: 0.5px;
+}
+.footer-distance span { color: var(--accent); font-weight: 700; }
 .footer-bar a { color: var(--muted); text-decoration: none; }
 .footer-bar a:hover { color: var(--accent); }
 
@@ -252,6 +304,7 @@ h1 {
   .stats-bar { gap: 16px; }
   .stat-value { font-size: 1.1rem; }
   .modal-card { padding: 18px; }
+  .progress-wrap { max-width: 280px; }
 }
 </style>
 </head>
@@ -270,7 +323,7 @@ h1 {
 <div class="stats-bar">
   <div class="stat">
     <span class="stat-value" id="sold-count">—</span>
-    <span class="stat-label" id="sold-label">/ 648</span>
+    <span class="stat-label" id="sold-label">/ 1,000,000 sold</span>
   </div>
   <div class="stat">
     <span class="stat-value" id="revenue">—</span>
@@ -278,14 +331,22 @@ h1 {
   </div>
 </div>
 
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="progress-label" id="progress-label"></div>
+</div>
+
 <div id="globe-container"></div>
 <div id="tooltip" class="hidden"></div>
 
 <div class="footer-bar">
-  <span class="dot"></span>
-  <span id="footer-text"></span>
-  <span style="margin-left:12px;">|</span>
-  <a href="https://agilelabspl.github.io/okozorbity/" target="_blank" style="margin-left:12px;">Oko z Orbity</a>
+  <div class="footer-distance" id="footer-distance"></div>
+  <div style="margin-top:4px;">
+    <span class="dot"></span>
+    <span id="footer-text"></span>
+    <span style="margin-left:12px;">|</span>
+    <a href="https://agilelabspl.github.io/okozorbity/" target="_blank" style="margin-left:12px;">Oko z Orbity</a>
+  </div>
 </div>
 
 <div id="modal" class="modal-overlay hidden">
@@ -312,26 +373,30 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // ── CONFIG ──
 const MARS_RADIUS_KM = 3389.5;
 const GLOBE_R = 2;
-const GRID_COLS = 36;
-const GRID_ROWS = 18;
-const DEG = 10;
+const GRID_COLS = 1000;
+const GRID_ROWS = 1000;
+const DEG_LON = 360 / GRID_COLS;  // 0.36
+const DEG_LAT = 180 / GRID_ROWS;  // 0.18
+const PLOT_PRICE = 2;
+const TOTAL_PLOTS = GRID_COLS * GRID_ROWS; // 1,000,000
+const RETIREMENT_GOAL = TOTAL_PLOTS * PLOT_PRICE; // $2,000,000
 
 // ── LABELS ──
 const T = {
   loading: 'Loading Mars...',
-  title: 'Mars Billboard',
-  pageTitle: 'Mars Billboard — Buy a Plot on Mars',
-  subtitle: 'Million Dollar Homepage... but on Mars.',
+  title: 'Mars Retirement Plan',
+  pageTitle: 'Mars Retirement Plan — Buy a Plot on Mars',
+  subtitle: "The world's worst investment strategy.",
   soldLabel: 'sold',
-  revenueLabel: 'value',
-  footer: '648 plots · 144.8M km² · Texture: NASA/Solar System Scope',
+  revenueLabel: '/ $2,000,000',
+  footer: '1,000,000 plots · $2 each · 144.8M km² · Texture: NASA/Solar System Scope',
   plotLabel: 'Plot',
   coords: 'Coordinates',
   area: 'Area',
   price: 'Price',
   owner: 'Owner',
   date: 'Purchase date',
-  reserve: 'Reserve this plot',
+  reserve: 'Buy this plot — $2',
   comingSoon: 'registration coming soon',
   sold: 'SOLD',
   free: 'AVAILABLE',
@@ -339,64 +404,84 @@ const T = {
   paidLabel: 'Paid',
 };
 
-// ── SOLD PLOTS ──
-const SOLD = {
-  '4-10':  { owner: 'Elon Musk', msg: 'Future SpaceX HQ', loc: 'Olympus Mons', date: '2025-12-25', price: 50000000, color: '#f97316' },
-  '11-7':  { owner: 'Grand Canyon Tourism Board', msg: 'Hold my beer', loc: 'Valles Marineris', date: '2026-01-15', price: 25000000, color: '#ef4444' },
-  '31-8':  { owner: 'NASA Curiosity', msg: 'I was here first!', loc: 'Gale Crater', date: '2012-08-06', price: 10000000, color: '#38bdf8' },
-  '25-4':  { owner: 'IKEA Mars', msg: 'BJÖRK shelf — some assembly required', loc: 'Hellas Planitia', date: '2026-02-01', price: 5000000, color: '#facc15' },
-  '15-13': { owner: 'Mark Watney', msg: "I'm gonna science the shit out of this", loc: 'Acidalia Planitia', date: '2035-11-01', price: 1000000, color: '#22c55e' },
-  '33-9':  { owner: 'Jeff Bezos', msg: 'Amazon Prime Mars — delivery in 7 months', loc: 'Elysium Planitia', date: '2026-01-20', price: 15000000, color: '#a78bfa' },
-  '25-9':  { owner: 'Pizza Hut Mars', msg: "30 light-minutes or it's free", loc: 'Syrtis Major', date: '2026-01-10', price: 3000000, color: '#ef4444' },
-  '14-11': { owner: 'NASA Viking', msg: 'First selfie on Mars since 1976', loc: 'Chryse Planitia', date: '1976-07-20', price: 5000000, color: '#60a5fa' },
-  '28-11': { owner: 'Zhurong 祝融', msg: 'China was here', loc: 'Utopia Planitia', date: '2021-05-14', price: 8000000, color: '#f87171' },
-  '19-11': { owner: 'Dogecoin Foundation', msg: 'To the Mars! Much red. Very planet.', loc: 'Arabia Terra', date: '2026-02-14', price: 1000000, color: '#fbbf24' },
-  '8-9':   { owner: "McDonald's Mars", msg: 'Over 0 served', loc: 'Tharsis', date: '2026-01-05', price: 7000000, color: '#fbbf24' },
-  '2-11':  { owner: 'Netflix Mars', msg: 'Still buffering...', loc: 'Amazonis Planitia', date: '2026-02-10', price: 4000000, color: '#ef4444' },
-  '19-5':  { owner: 'Matt Damon', msg: "I'm not stuck here again, am I?", loc: 'Noachis Terra', date: '2026-01-28', price: 2000000, color: '#fb923c' },
-  '1-13':  { owner: 'LEGO Mars', msg: 'Everything is awesome on Mars!', loc: 'Arcadia Planitia', date: '2026-02-05', price: 3000000, color: '#facc15' },
-  '25-10': { owner: 'Perseverance', msg: 'Rocks. More rocks. Still rocks.', loc: 'Jezero Crater', date: '2021-02-18', price: 6000000, color: '#38bdf8' },
-  '32-5':  { owner: "Elon's Cat", msg: 'Meow from Mars', loc: 'Terra Cimmeria', date: '2026-02-20', price: 1000000, color: '#f9a8d4' },
-  '9-6':   { owner: 'Bernie Sanders', msg: 'Free healthcare for all planets!', loc: 'Solis Planum', date: '2026-02-15', price: 1000000, color: '#60a5fa' },
-  '13-4':  { owner: 'Starbucks Mars', msg: 'Venti Martian Latte — $47.99', loc: 'Argyre Planitia', date: '2026-01-18', price: 4000000, color: '#22c55e' },
-  '7-13':  { owner: 'Google Mars', msg: "I'm feeling lucky", loc: 'Alba Mons', date: '2026-02-08', price: 10000000, color: '#4ade80' },
-  '12-10': { owner: 'SpaceX Intern', msg: 'Elon said I could have this one', loc: 'Lunae Planum', date: '2026-02-22', price: 1000000, color: '#fb923c' },
-  '13-9':  { owner: 'Wikipedia Mars', msg: '[citation needed]', loc: 'Xanthe Terra', date: '2026-02-12', price: 0, color: '#94a3b8' },
-  '29-7':  { owner: 'Mars Inc.', msg: 'Finally on brand', loc: 'Hesperia Planum', date: '2026-01-25', price: 20000000, color: '#7c3aed' },
-  '22-8':  { owner: 'Rick Astley', msg: 'Never gonna give Mars up', loc: 'Terra Sabaea', date: '2026-02-14', price: 1000000, color: '#f43f5e' },
-  '5-7':   { owner: 'ChatGPT', msg: 'As a large language model, I cannot own land', loc: 'Daedalia Planum', date: '2026-02-18', price: 0, color: '#818cf8' },
-  '11-13': { owner: 'Your Mom', msg: 'She says hi from Mars!', loc: 'Tempe Terra', date: '2026-02-23', price: 1000000, color: '#f472b6' },
-};
+// ── SOLD PLOTS (lat/lon format) ──
+const SOLD_LIST = [
+  { lat: 15,  lon: -135, owner: 'Elon Musk',       msg: 'Future SpaceX HQ',                        loc: 'Olympus Mons',     date: '2025-12-25', price: 50000000, color: '#f97316' },
+  { lat: -15, lon: -65,  owner: 'Grand Canyon Tourism Board', msg: 'Hold my beer',                  loc: 'Valles Marineris', date: '2026-01-15', price: 25000000, color: '#ef4444' },
+  { lat: -5,  lon: 135,  owner: 'NASA Curiosity',   msg: 'I was here first!',                       loc: 'Gale Crater',      date: '2012-08-06', price: 10000000, color: '#38bdf8' },
+  { lat: -45, lon: 75,   owner: 'IKEA Mars',        msg: 'BJÖRK shelf — some assembly required',    loc: 'Hellas Planitia',  date: '2026-02-01', price: 5000000,  color: '#facc15' },
+  { lat: 45,  lon: -25,  owner: 'Mark Watney',      msg: "I'm gonna science the shit out of this",  loc: 'Acidalia Planitia',date: '2035-11-01', price: 1000000,  color: '#22c55e' },
+  { lat: 5,   lon: 155,  owner: 'Jeff Bezos',       msg: 'Amazon Prime Mars — delivery in 7 months',loc: 'Elysium Planitia', date: '2026-01-20', price: 15000000, color: '#a78bfa' },
+  { lat: 5,   lon: 75,   owner: 'Pizza Hut Mars',   msg: "30 light-minutes or it's free",           loc: 'Syrtis Major',     date: '2026-01-10', price: 3000000,  color: '#ef4444' },
+  { lat: 25,  lon: -35,  owner: 'NASA Viking',      msg: 'First selfie on Mars since 1976',         loc: 'Chryse Planitia',  date: '1976-07-20', price: 5000000,  color: '#60a5fa' },
+  { lat: 25,  lon: 105,  owner: 'Zhurong 祝融',     msg: 'China was here',                          loc: 'Utopia Planitia',  date: '2021-05-14', price: 8000000,  color: '#f87171' },
+  { lat: 25,  lon: 15,   owner: 'Dogecoin Foundation', msg: 'To the Mars! Much red. Very planet.',  loc: 'Arabia Terra',     date: '2026-02-14', price: 1000000,  color: '#fbbf24' },
+  { lat: 5,   lon: -95,  owner: "McDonald's Mars",  msg: 'Over 0 served',                           loc: 'Tharsis',          date: '2026-01-05', price: 7000000,  color: '#fbbf24' },
+  { lat: 25,  lon: -155, owner: 'Netflix Mars',     msg: 'Still buffering...',                       loc: 'Amazonis Planitia',date: '2026-02-10', price: 4000000,  color: '#ef4444' },
+  { lat: -35, lon: 15,   owner: 'Matt Damon',       msg: "I'm not stuck here again, am I?",         loc: 'Noachis Terra',    date: '2026-01-28', price: 2000000,  color: '#fb923c' },
+  { lat: 45,  lon: -165, owner: 'LEGO Mars',        msg: 'Everything is awesome on Mars!',           loc: 'Arcadia Planitia', date: '2026-02-05', price: 3000000,  color: '#facc15' },
+  { lat: 15,  lon: 75,   owner: 'Perseverance',     msg: 'Rocks. More rocks. Still rocks.',          loc: 'Jezero Crater',    date: '2021-02-18', price: 6000000,  color: '#38bdf8' },
+  { lat: -35, lon: 145,  owner: "Elon's Cat",       msg: 'Meow from Mars',                          loc: 'Terra Cimmeria',   date: '2026-02-20', price: 1000000,  color: '#f9a8d4' },
+  { lat: -25, lon: -85,  owner: 'Bernie Sanders',   msg: 'Free healthcare for all planets!',         loc: 'Solis Planum',     date: '2026-02-15', price: 1000000,  color: '#60a5fa' },
+  { lat: -45, lon: -45,  owner: 'Starbucks Mars',   msg: 'Venti Martian Latte — $47.99',            loc: 'Argyre Planitia',  date: '2026-01-18', price: 4000000,  color: '#22c55e' },
+  { lat: 45,  lon: -105, owner: 'Google Mars',      msg: "I'm feeling lucky",                       loc: 'Alba Mons',        date: '2026-02-08', price: 10000000, color: '#4ade80' },
+  { lat: 15,  lon: -55,  owner: 'SpaceX Intern',    msg: 'Elon said I could have this one',         loc: 'Lunae Planum',     date: '2026-02-22', price: 1000000,  color: '#fb923c' },
+  { lat: 5,   lon: -45,  owner: 'Wikipedia Mars',   msg: '[citation needed]',                        loc: 'Xanthe Terra',     date: '2026-02-12', price: 0,        color: '#94a3b8' },
+  { lat: -15, lon: 115,  owner: 'Mars Inc.',         msg: 'Finally on brand',                        loc: 'Hesperia Planum',  date: '2026-01-25', price: 20000000, color: '#7c3aed' },
+  { lat: -5,  lon: 45,   owner: 'Rick Astley',      msg: 'Never gonna give Mars up',                loc: 'Terra Sabaea',     date: '2026-02-14', price: 1000000,  color: '#f43f5e' },
+  { lat: -15, lon: -125, owner: 'ChatGPT',          msg: 'As a large language model, I cannot own land', loc: 'Daedalia Planum', date: '2026-02-18', price: 0, color: '#818cf8' },
+  { lat: 45,  lon: -65,  owner: 'Your Mom',         msg: 'She says hi from Mars!',                  loc: 'Tempe Terra',      date: '2026-02-23', price: 1000000,  color: '#f472b6' },
+];
 
-// ── GRID / PLOT GENERATION ──
+// ── Build SOLD Map (key = "col-row") ──
+const SOLD = new Map();
+function latLonToColRow(lat, lon) {
+  const col = Math.max(0, Math.min(GRID_COLS - 1, Math.floor((lon + 180) / DEG_LON)));
+  const row = Math.max(0, Math.min(GRID_ROWS - 1, Math.floor((lat + 90) / DEG_LAT)));
+  return { col, row };
+}
+for (const s of SOLD_LIST) {
+  const { col, row } = latLonToColRow(s.lat, s.lon);
+  SOLD.set(`${col}-${row}`, s);
+}
+
+// ── AREA CALC ──
 function calcArea(lat1Deg, lat2Deg, lonSpanDeg) {
   const R = MARS_RADIUS_KM;
   const l1 = lat1Deg * Math.PI / 180, l2 = lat2Deg * Math.PI / 180;
   return Math.abs(R * R * (Math.sin(l2) - Math.sin(l1)) * (lonSpanDeg * Math.PI / 180));
 }
 
-function generatePlots() {
-  const plots = []; let num = 1;
-  for (let row = 0; row < GRID_ROWS; row++) {
-    for (let col = 0; col < GRID_COLS; col++) {
-      const lat0 = row * DEG - 90, lat1 = lat0 + DEG;
-      const lon0 = col * DEG - 180, lon1 = lon0 + DEG;
-      const id = `${col}-${row}`;
-      const sold = SOLD[id] || null;
-      plots.push({ id, num: num++, row, col, lat0, lat1, lon0, lon1,
-        latC: (lat0 + lat1) / 2, lonC: (lon0 + lon1) / 2,
-        area: Math.round(calcArea(lat0, lat1, DEG)),
-        price: sold ? sold.price : 1000000, sold });
-    }
-  }
-  return plots;
+// ── LAZY PLOT COMPUTATION ──
+function getPlotAt(lat, lon) {
+  const col = Math.floor((lon + 180) / DEG_LON);
+  const row = Math.floor((lat + 90) / DEG_LAT);
+  if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return null;
+
+  const lat0 = row * DEG_LAT - 90;
+  const lat1 = lat0 + DEG_LAT;
+  const lon0 = col * DEG_LON - 180;
+  const lon1 = lon0 + DEG_LON;
+  const key = `${col}-${row}`;
+  const sold = SOLD.get(key) || null;
+
+  return {
+    id: key, col, row,
+    lat0, lat1, lon0, lon1,
+    latC: (lat0 + lat1) / 2,
+    lonC: (lon0 + lon1) / 2,
+    area: Math.round(calcArea(lat0, lat1, DEG_LON)),
+    price: sold ? sold.price : PLOT_PRICE,
+    sold
+  };
 }
 
 // ── HELPERS ──
 function fmtPrice(n) {
   if (n === 0) return 'Donated';
   if (n >= 1e6) return '$' + (n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1) + 'M';
-  return '$' + n.toLocaleString();
+  if (n >= 1e3) return '$' + n.toLocaleString();
+  return '$' + n;
 }
 function fmtCoords(lat, lon) {
   return `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(1)}°${lon >= 0 ? 'E' : 'W'}`;
@@ -404,7 +489,6 @@ function fmtCoords(lat, lon) {
 function fmtArea(km2) { return km2.toLocaleString('en-US') + ' km²'; }
 
 // ── COORDINATE CONVERSION ──
-// Three.js SphereGeometry: phi=azimuthal from +X (ccw), theta=polar from +Y
 function latLonToVec3(lat, lon, r) {
   const phi = (lon + 180) * Math.PI / 180;
   const theta = (90 - lat) * Math.PI / 180;
@@ -422,33 +506,6 @@ function vec3ToLatLon(p) {
   return { lat, lon };
 }
 
-// ── CELL MESH BUILDER ──
-function createCellGeometry(lat0, lat1, lon0, lon1, r) {
-  const S = 5;
-  const verts = [];
-  const idx = [];
-  for (let i = 0; i <= S; i++) {
-    for (let j = 0; j <= S; j++) {
-      const lat = lat0 + (lat1 - lat0) * i / S;
-      const lon = lon0 + (lon1 - lon0) * j / S;
-      const v = latLonToVec3(lat, lon, r);
-      verts.push(v.x, v.y, v.z);
-    }
-  }
-  for (let i = 0; i < S; i++) {
-    for (let j = 0; j < S; j++) {
-      const a = i * (S + 1) + j, b = a + 1;
-      const c = (i + 1) * (S + 1) + j, d = c + 1;
-      idx.push(a, c, b, b, c, d);
-    }
-  }
-  const geom = new THREE.BufferGeometry();
-  geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  geom.setIndex(idx);
-  geom.computeVertexNormals();
-  return geom;
-}
-
 // ── MODAL ──
 function showModal(plot) {
   const modal = document.getElementById('modal');
@@ -458,7 +515,7 @@ function showModal(plot) {
     body.innerHTML = `
       <div class="modal-badge sold">${T.sold}</div>
       <div class="modal-title" style="color:${s.color}">${s.loc}</div>
-      <div class="modal-location">${T.plotLabel} #${plot.num} · ${fmtCoords(plot.latC, plot.lonC)}</div>
+      <div class="modal-location">${T.plotLabel} #${plot.col}-${plot.row} · ${fmtCoords(plot.latC, plot.lonC)}</div>
       <div class="modal-msg" style="border-color:${s.color}">"${s.msg}"</div>
       <div class="modal-row"><span>${T.owner}</span><span>${s.owner}</span></div>
       <div class="modal-row"><span>${T.date}</span><span>${s.date}</span></div>
@@ -468,7 +525,7 @@ function showModal(plot) {
   } else {
     body.innerHTML = `
       <div class="modal-badge free">${T.free}</div>
-      <div class="modal-title">${T.plotLabel} #${plot.num}</div>
+      <div class="modal-title">${T.plotLabel} #${plot.col}-${plot.row}</div>
       <div class="modal-location">${fmtCoords(plot.lat0, plot.lon0)} → ${fmtCoords(plot.lat1, plot.lon1)}</div>
       <div class="modal-row"><span>${T.coords}</span><span>${fmtCoords(plot.latC, plot.lonC)}</span></div>
       <div class="modal-row"><span>${T.area}</span><span>${fmtArea(plot.area)}</span></div>
@@ -485,19 +542,40 @@ function hideModal() { document.getElementById('modal').classList.add('hidden');
 // ── THREE.JS SCENE ──
 // ══════════════════════════════════════════
 function init() {
-  // i18n
+  // ── Labels / i18n ──
   document.title = T.pageTitle;
   document.querySelector('#loading p').textContent = T.loading;
   document.querySelector('h1').textContent = T.title;
   document.querySelector('.subtitle').textContent = T.subtitle;
-  document.getElementById('sold-label').textContent = `/ 648 ${T.soldLabel}`;
   document.getElementById('revenue-label').textContent = T.revenueLabel;
   document.getElementById('footer-text').textContent = T.footer;
 
-  const plots = generatePlots();
-  const soldPlots = plots.filter(p => p.sold);
-  document.getElementById('sold-count').textContent = soldPlots.length;
-  document.getElementById('revenue').textContent = fmtPrice(soldPlots.reduce((s, p) => s + p.sold.price, 0));
+  // ── Earth-Mars distance (simplified circular orbits) ──
+  function getMarsDist() {
+    const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
+    const days = (Date.now() - J2000) / 86400000;
+    const earthL = (100.46 + 0.9856 * days) % 360;
+    const marsL = (355.45 + 0.5240 * days) % 360;
+    const angle = (marsL - earthL) * Math.PI / 180;
+    const dist = Math.sqrt(1 + 1.524 * 1.524 - 2 * 1.524 * Math.cos(angle));
+    return Math.round(dist * 149597871);
+  }
+  function updateDistance() {
+    const km = getMarsDist();
+    document.getElementById('footer-distance').innerHTML =
+      `Your silly investment — <span>${km.toLocaleString('en-US')}</span> km from Earth`;
+  }
+  updateDistance();
+  setInterval(updateDistance, 60000);
+
+  // ── Stats ──
+  const soldCount = SOLD_LIST.length;
+  const revenue = soldCount * PLOT_PRICE;
+  const pct = (soldCount / TOTAL_PLOTS * 100);
+  document.getElementById('sold-count').textContent = soldCount;
+  document.getElementById('revenue').textContent = fmtPrice(revenue);
+  document.getElementById('progress-fill').style.width = Math.max(pct, 0.15) + '%';
+  document.getElementById('progress-label').textContent = pct.toFixed(4) + '% to retirement';
 
   const container = document.getElementById('globe-container');
   const W = container.clientWidth, H = container.clientHeight;
@@ -527,7 +605,7 @@ function init() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
 
-  // ── Lighting (orbitsignal style) ──
+  // ── Lighting ──
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
   mainLight.position.set(5, 3, 5);
@@ -538,7 +616,7 @@ function init() {
 
   // ── Stars ──
   const starPositions = [];
-  for (let i = 0; i < 3000; i++) {
+  for (let i = 0; i < 8000; i++) {
     const r = 50 + Math.random() * 50;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(2 * Math.random() - 1);
@@ -566,7 +644,7 @@ function init() {
   const globe = new THREE.Mesh(globeGeom, globeMat);
   scene.add(globe);
 
-  // ── Atmosphere layers (orbitsignal technique: BackSide spheres) ──
+  // ── Atmosphere layers ──
   scene.add(new THREE.Mesh(
     new THREE.SphereGeometry(GLOBE_R * 1.01, 64, 64),
     new THREE.MeshBasicMaterial({ color: 0xcc6644, transparent: true, opacity: 0.08, side: THREE.BackSide })
@@ -576,36 +654,56 @@ function init() {
     new THREE.MeshBasicMaterial({ color: 0xff8844, transparent: true, opacity: 0.04, side: THREE.BackSide })
   ));
 
-  // ── Grid lines ──
-  const gridMat = new THREE.LineBasicMaterial({ color: 0xc1440e, transparent: true, opacity: 0.12 });
+  // ── Grid lines (orientation lines every 30°, subtle dashed) ──
+  const gridMat = new THREE.LineDashedMaterial({ color: 0xe8734a, transparent: true, opacity: 0.15, dashSize: 0.08, gapSize: 0.06 });
   const gridR = GLOBE_R * 1.001;
 
-  // Latitude lines
-  for (let lat = -80; lat <= 80; lat += DEG) {
+  // Latitude lines every 30° (-60 to +60)
+  for (let lat = -60; lat <= 60; lat += 30) {
     const pts = [];
     for (let lon = -180; lon <= 180; lon += 2) pts.push(latLonToVec3(lat, lon, gridR));
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat);
+    line.computeLineDistances();
+    scene.add(line);
   }
-  // Longitude lines
-  for (let lon = -180; lon < 180; lon += DEG) {
+  // Longitude lines every 30°
+  for (let lon = -180; lon < 180; lon += 30) {
     const pts = [];
     for (let lat = -90; lat <= 90; lat += 2) pts.push(latLonToVec3(lat, lon, gridR));
-    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat);
+    line.computeLineDistances();
+    scene.add(line);
   }
 
-  // ── Sold cell meshes ──
-  const cellR = GLOBE_R * 1.002;
-  const soldMeshes = [];
-  for (const plot of plots) {
-    if (!plot.sold) continue;
-    const geom = createCellGeometry(plot.lat0, plot.lat1, plot.lon0, plot.lon1, cellR);
-    const mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
-      color: new THREE.Color(plot.sold.color),
-      transparent: true, opacity: 0.3, side: THREE.DoubleSide, depthWrite: false,
-    }));
-    scene.add(mesh);
-    soldMeshes.push(mesh);
+  // ── Canvas overlay for sold plots ──
+  const SOLD_MARKER_SIZE = 9;
+  const overlayCanvas = document.createElement('canvas');
+  overlayCanvas.width = GRID_COLS;
+  overlayCanvas.height = GRID_ROWS;
+  const overlayCtx = overlayCanvas.getContext('2d');
+  let overlayTexture = null;
+
+  function updateOverlay() {
+    overlayCtx.clearRect(0, 0, GRID_COLS, GRID_ROWS);
+    for (const s of SOLD_LIST) {
+      const { col, row } = latLonToColRow(s.lat, s.lon);
+      overlayCtx.fillStyle = s.color;
+      const cy = (GRID_ROWS - 1) - row;
+      const half = Math.floor(SOLD_MARKER_SIZE / 2);
+      overlayCtx.fillRect(col - half, cy - half, SOLD_MARKER_SIZE, SOLD_MARKER_SIZE);
+    }
+    if (overlayTexture) overlayTexture.needsUpdate = true;
   }
+
+  updateOverlay();
+  overlayTexture = new THREE.CanvasTexture(overlayCanvas);
+  overlayTexture.minFilter = THREE.NearestFilter;
+  overlayTexture.magFilter = THREE.NearestFilter;
+  const overlaySphere = new THREE.Mesh(
+    new THREE.SphereGeometry(GLOBE_R * 1.002, 64, 64),
+    new THREE.MeshBasicMaterial({ map: overlayTexture, transparent: true, opacity: 0.7, depthWrite: false })
+  );
+  scene.add(overlaySphere);
 
   // ── Rover markers ──
   const ROVERS = [
@@ -635,7 +733,6 @@ function init() {
     const group = new THREE.Group();
     group.position.copy(pos);
 
-    // Glow sprite
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
       map: glowTexture, color: rv.color, transparent: true, opacity: 0.9,
       blending: THREE.AdditiveBlending, depthWrite: false,
@@ -643,7 +740,6 @@ function init() {
     sprite.scale.set(0.12, 0.12, 1);
     group.add(sprite);
 
-    // Point light
     const light = new THREE.PointLight(rv.color, 0.3, 0.6);
     group.add(light);
 
@@ -651,7 +747,7 @@ function init() {
     roverMarkers.push({ group, sprite, rv, baseScale: 0.12 });
   }
 
-  // Rover label overlay (CSS2D-like, positioned in render loop)
+  // Rover label overlay
   const roverLabelsEl = document.createElement('div');
   roverLabelsEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden;';
   container.appendChild(roverLabelsEl);
@@ -661,7 +757,7 @@ function init() {
     el.style.cssText = `position:absolute;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
       color:#fff;background:rgba(0,0,0,0.7);padding:1px 5px;border-radius:3px;white-space:nowrap;
       border:1px solid #${rv.color.toString(16).padStart(6,'0')}40;transform:translate(-50%,-100%);`;
-    el.textContent = rv.name.split(' ')[0]; // short name
+    el.textContent = rv.name.split(' ')[0];
     roverLabelsEl.appendChild(el);
     return el;
   });
@@ -670,7 +766,6 @@ function init() {
     for (let i = 0; i < ROVERS.length; i++) {
       const pos = roverMarkers[i].group.position.clone().project(camera);
       const el = roverLabelDivs[i];
-      // Behind globe check
       const camDist = camera.position.distanceTo(roverMarkers[i].group.position);
       const centerDist = camera.position.length();
       if (pos.z > 1 || camDist > centerDist + GLOBE_R * 0.3) {
@@ -680,24 +775,6 @@ function init() {
         el.style.left = ((pos.x + 1) / 2 * 100) + '%';
         el.style.top = ((-pos.y + 1) / 2 * 100) + '%';
       }
-    }
-  }
-
-  // ── Hover highlight mesh ──
-  let hoverMesh = null;
-  let hoveredPlot = null;
-  const hoverMat = new THREE.MeshBasicMaterial({
-    color: 0xffffff, transparent: true, opacity: 0.15, side: THREE.DoubleSide, depthWrite: false,
-  });
-
-  function setHover(plot) {
-    if (plot === hoveredPlot) return;
-    hoveredPlot = plot;
-    if (hoverMesh) { scene.remove(hoverMesh); hoverMesh.geometry.dispose(); hoverMesh = null; }
-    if (plot) {
-      const geom = createCellGeometry(plot.lat0, plot.lat1, plot.lon0, plot.lon1, cellR + 0.001);
-      hoverMesh = new THREE.Mesh(geom, hoverMat);
-      scene.add(hoverMesh);
     }
   }
 
@@ -715,16 +792,12 @@ function init() {
     const hits = raycaster.intersectObject(globe);
     if (hits.length === 0) return null;
     const { lat, lon } = vec3ToLatLon(hits[0].point);
-    const col = Math.floor((lon + 180) / DEG);
-    const row = Math.floor((lat + 90) / DEG);
-    if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS) return null;
-    return plots[row * GRID_COLS + col];
+    return getPlotAt(lat, lon);
   }
 
   renderer.domElement.addEventListener('mousemove', (e) => {
-    if (isDragging) { setHover(null); tooltip.classList.add('hidden'); return; }
+    if (isDragging) { tooltip.classList.add('hidden'); container.style.cursor = 'grabbing'; return; }
     const plot = getPlotFromEvent(e);
-    setHover(plot);
     if (plot) {
       container.style.cursor = 'pointer';
       tooltip.style.left = (e.clientX + 14) + 'px';
@@ -733,7 +806,7 @@ function init() {
         tooltip.innerHTML = `<b style="color:${plot.sold.color}">${plot.sold.owner}</b><small>${plot.sold.loc}</small>`;
         tooltip.style.borderColor = plot.sold.color + '40';
       } else {
-        tooltip.innerHTML = `<b>${T.plotLabel} #${plot.num}</b><small>${fmtArea(plot.area)} · ${fmtPrice(plot.price)}</small>`;
+        tooltip.innerHTML = `<b>${T.plotLabel} #${plot.col}-${plot.row}</b><small>${fmtArea(plot.area)} · ${fmtPrice(plot.price)}</small>`;
         tooltip.style.borderColor = 'rgba(193,68,14,0.25)';
       }
       tooltip.style.border = `1px solid ${tooltip.style.borderColor}`;
@@ -796,7 +869,7 @@ function init() {
 }
 
 try { init(); } catch(e) {
-  console.error('Mars Billboard error:', e);
+  console.error('Mars Retirement Plan error:', e);
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('globe-container').innerHTML =
     `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#ef4444;font-size:1rem;padding:20px;text-align:center;">
